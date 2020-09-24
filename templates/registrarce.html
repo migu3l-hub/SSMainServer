@@ -1,0 +1,32 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Iniciar Sesion</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"> <!--Necesaria la cdn de bootstrap-->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}">
+    <script src="{% static 'js/login.js' %}"></script>
+</head>
+<body>
+<div class="login-page">
+  <div class="form">
+    <form method="post" action="{% url 'signup' %}">
+      {% csrf_token %}
+      {{ form.username }}
+      {{ form.first_name }}
+      {{ form.last_name }}
+      {{ form.email }}
+      {{ form.password1 }}
+      {{ form.password2 }}
+        {% if errores %}
+            <div class="alert alert-danger" role="alert">{{ errores }}</div>
+        {% endif %}
+      <button type="submit">Crear</button>
+      <p class="message">Ya registrado? <a href="{% url 'login' %}">Logearce</a></p>
+    </form>
+  </div>
+
+</div>
+</body>
+</html>

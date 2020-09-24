@@ -10,20 +10,21 @@
 <body>
 <div class="login-page">
   <div class="form">
-    <form class="register-form">
-      <input type="text" placeholder="name"/>
-      <input type="password" placeholder="password"/>
-      <input type="text" placeholder="email address"/>
-      <button>create</button>
-      <p class="message">Already registered? <a href="#">Sign In</a></p>
-    </form>
-    <form class="login-form">
-      <input type="text" placeholder="username"/>
-      <input type="password" placeholder="password"/>
-      <button>login</button>
-      <p class="message">Not registered? <a href="#">Create an account</a></p>
+    <form class="login-form" method="POST" action="{% url 'login' %}">
+      {% csrf_token %}
+      {{ form.username }}
+      {{ form.password }}
+      <button type="submit">Logearce</button>
+      <p class="message">No registrado? <a href="{% url 'signup' %}">Crear una cuenta</a></p>
     </form>
   </div>
+    <div class="form-group">
+        {% if errores %}
+           <div id="form_error" class="alert alert-danger alert-dismissible fade in col-sm-offset-1 col-sm-5">{{errores}}</div>
+        {% else %}
+           <div id="form_error" class="col-sm-offset-1 col-sm-5"></div>
+        {% endif %}
+    </div>
 </div>
 </body>
 </html>
