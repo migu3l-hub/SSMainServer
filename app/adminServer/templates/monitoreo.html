@@ -1,0 +1,311 @@
+﻿{% extends 'plantilla.html' %}
+{% load static %}
+
+{% block titulo %}Lista de Servidores{% endblock %}
+{% block extrahead %}
+    <script src="{% static 'lib/highcharts-8.2.2/highcharts.js' %}"></script>
+    <script src="{% static 'lib/highcharts-8.2.2/modules/exporting.js' %}"></script>
+    <script src="{% static 'lib/highcharts-8.2.2/modules/export-data.js' %}"></script>
+    <script src="{% static 'lib/highcharts-8.2.2/modules/accessibility.js' %}"></script>
+    <script src="{% static 'lib/highcharts-8.2.2/highcharts-more.js' %}"></script>
+    <script src="{% static 'lib/highcharts-8.2.2/modules/solid-gauge.js' %}"></script>
+{% endblock %}
+{% block contenido %}
+    <div class="">
+        <div class="row">
+            <div class="col-lg-6">
+                <div id="container"></div>
+            </div>
+            <div class="col-lg-6">
+                <div id="container-speed"></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-7">
+                <div id="container-rpm"></div>
+            </div>
+            <div class="col-lg-4">
+                <div id="imagen_monitor">
+                    <img class="img-thumbnail" src="{% static 'images/monitoreo2.jpeg' %}" alt="Administrador trabjando">
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script type="application/javascript">
+    Highcharts.chart('container', {
+    chart: {
+        type: 'spline',
+        animation: Highcharts.svg, // don't animate in old IE
+        marginRight: 10,
+        events: {
+            load: function () {
+
+                // set up the updating of the chart each second
+                var series = this.series[0];
+                setInterval(function () {
+                    $.ajax({ // Se copia el ajax en la parte donde se generan los datos
+                        url: window.location.pathname,
+                        type: 'POST',
+                        data: {
+                            'action': 'obtener_datos_disco'
+                        },
+                        dataType: 'json',
+                    }).done(function (data) {
+                        if (!data.hasOwnProperty('error')) {
+                            var x = (new Date()).getTime();
+                            series.addPoint([x, data.y], true, true); // 'y' es la variable que se usa en este caso que es el .y ?
+                            return false;
+                        }
+                    });
+                }, 1000); // es cada cuanto va a refrescar lo dejamos asi
+            }
+        }
+    },
+
+    time: {
+        useUTC: false
+    },
+
+    title: {
+        text: 'Porcentaje de uso disco'
+    },
+
+    accessibility: {
+        announceNewData: {
+            enabled: true,
+            minAnnounceInterval: 15000,
+            announcementFormatter: function (allSeries, newSeries, newPoint) {
+                if (newPoint) {
+                    return 'New point added. Value: ' + newPoint.y;
+                }
+                return false;
+            }
+        }
+    },
+
+    xAxis: {
+        type: 'datetime',
+        tickPixelInterval: 150
+    },
+
+    yAxis: {
+        title: {
+            text: 'Value'
+        },
+        plotLines: [{
+            value: 0,
+            width: 1,
+            color: '#808080'
+        }]
+    },
+
+    tooltip: {
+        headerFormat: '<b>{series.name}</b><br/>',
+        pointFormat: '{point.x:%Y-%m-%d %H:%M:%S}<br/>{point.y:.2f}'
+    },
+
+    legend: {
+        enabled: false
+    },
+
+    exporting: {
+        enabled: false
+    },
+
+    series: [{
+        name: 'Porcentaje de uso',
+        data: (function () {
+            // generate an array of random data
+            var data = [],
+                time = (new Date()).getTime(),
+                i;
+
+            for (i = -19; i <= 0; i += 1) {
+                data.push({
+                    x: time + i * 1000,
+                    y: Math.random()
+                });
+            }
+            return data;
+        }())
+    }]
+});
+    </script>
+    <script type="application/javascript">
+    var gaugeOptions = {
+    chart: {
+        type: 'solidgauge'
+    },
+
+    title: null,
+
+    pane: {
+        center: ['50%', '85%'],
+        size: '140%',
+        startAngle: -90,
+        endAngle: 90,
+        background: {
+            backgroundColor:
+                Highcharts.defaultOptions.legend.backgroundColor || '#EEE',
+            innerRadius: '60%',
+            outerRadius: '100%',
+            shape: 'arc'
+        }
+    },
+
+    exporting: {
+        enabled: false
+    },
+
+    tooltip: {
+        enabled: false
+    },
+
+    // the value axis
+    yAxis: {
+        stops: [
+            [0.1, '#55BF3B'], // green
+            [0.5, '#DDDF0D'], // yellow
+            [0.9, '#DF5353'] // red
+        ],
+        lineWidth: 0,
+        tickWidth: 0,
+        minorTickInterval: null,
+        tickAmount: 2,
+        title: {
+            y: -70
+        },
+        labels: {
+            y: 16
+        }
+    },
+
+    plotOptions: {
+        solidgauge: {
+            dataLabels: {
+                y: 5,
+                borderWidth: 0,
+                useHTML: true
+            }
+        }
+    }
+};
+
+// The speed gauge
+var chartSpeed = Highcharts.chart('container-speed', Highcharts.merge(gaugeOptions, {
+    yAxis: {
+        min: 0,
+        max: 100,
+        title: {
+            text: 'Memoria'
+        }
+    },
+
+    credits: {
+        enabled: false
+    },
+
+    series: [{
+        name: 'Memoria',
+        data: [80],
+        dataLabels: {
+            format:
+                '<div style="text-align:center">' +
+                '<span style="font-size:25px">{y}</span><br/>' +
+                '<span style="font-size:12px;opacity:0.4">Porcentaje de uso Memoria</span>' +
+                '</div>'
+        },
+        tooltip: {
+            valueSuffix: ' Porcentaje de uso Memoria'
+        }
+    }]
+
+}));
+
+// The RPM gauge
+var chartRpm = Highcharts.chart('container-rpm', Highcharts.merge(gaugeOptions, {
+    yAxis: {
+        min: 0,
+        max: 100,
+        title: {
+            text: ' Uso de CPU'
+        }
+    },
+
+    series: [{
+        name: 'Porcentaje CPU',
+        data: [1],
+        dataLabels: {
+            format:
+                '<div style="text-align:center">' +
+                '<span style="font-size:25px">{y:.1f}</span><br/>' +
+                '<span style="font-size:12px;opacity:0.4">' +
+                '* Porcentaje de uso de CPU' +
+                '</span>' +
+                '</div>'
+        },
+        tooltip: {
+            valueSuffix: ' Porcentaje de uso de CPU'
+        }
+    }]
+
+}));
+
+// Bring life to the dials
+setInterval(function () {
+    // Speed
+    var point,
+        newVal,
+        inc;
+
+    if (chartSpeed) {
+
+        $.ajax({ // Se copia el ajax en la parte donde se generan los datos
+            url: window.location.pathname,
+            type: 'POST',
+            data: {
+                'action': 'obtener_datos_memoria'
+            },
+            dataType: 'json',
+        }).done(function (data) {
+            if (!data.hasOwnProperty('error')) {
+                point = chartSpeed.series[0].points[0];
+                inc = data.y;
+                newVal = inc;
+            if (newVal < 0 || newVal > 100) {
+                newVal = point.y - inc;
+            }
+            point.update(newVal);
+            return false;
+            }
+        });
+    }
+
+    // RPM
+    if (chartRpm) {
+        $.ajax({ // Se copia el ajax en la parte donde se generan los datos
+            url: window.location.pathname,
+            type: 'POST',
+            data: {
+                'action': 'obtener_datos_monitor'
+            },
+            dataType: 'json',
+        }).done(function (data) {
+            if (!data.hasOwnProperty('error')) {
+                point = chartRpm.series[0].points[0];
+                inc = data.y;
+                newVal = inc;
+            if (newVal < 0 || newVal > 100) {
+                newVal = point.y - inc;
+            }
+            point.update(newVal);
+            return false;
+            }
+        });
+    }
+}, 2000);
+    </script>
+{% endblock %}
+
+y time

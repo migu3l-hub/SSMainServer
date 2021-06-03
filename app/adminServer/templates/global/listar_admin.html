@@ -1,0 +1,48 @@
+{% extends 'global/index.html' %}
+
+{% block titulo %}
+  Biblioteca.dev | Listado de Administradores
+{% endblock titulo %}
+
+{% block body %}
+
+  {% if admins %}
+      <div class="card">
+          <div class="card-header">
+              <strong class="card-title">Listado de Administradores</strong>
+          </div>
+          <div class="table-stats order-table ov-h">
+              <table class="table">
+                  <thead>
+                      <tr>
+                        <th>Usuario</th>
+                        <th>Nombre</th>
+                        <th>Apellidos</th>
+                        <th>Correo</th>
+                        <th>Ultimo login</th>
+                        <th>Opciones</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                    {% for admin in admins %}
+                      <tr>
+                        <td>{{ admin.username }}</td>
+                        <td>{{ admin.first_name }}</td>
+                        <td>{{ admin.last_name }}</td>
+                        <td>{{ admin.email }}</td>
+                        <td>{{ admin.last_login }}</td>
+                        <td>
+                          <a href="{% url 'global:editar_admin' admin.id %}" class="btn btn-primary">Editar</a>
+                          <a href="{% url 'global:eliminar_admin' admin.id %}" class="btn btn-danger">Eliminar</a>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+              </table>
+          </div>
+      </div>
+      {% else %}
+        <h1>No existen administradores registrados</h1>
+      {% endif %}
+
+{% endblock body %}

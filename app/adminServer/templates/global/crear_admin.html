@@ -1,0 +1,66 @@
+{% extends 'global/index.html' %}
+{% block titulo %}
+  Proyecto LANIA | Registro de Administradores
+{% endblock titulo %}
+
+{% block body %}
+<form method="POST">
+  {% csrf_token %}
+  {% if error %}
+    <h2>{{ error }}</h2>
+  {% else %}
+      <div class="card">
+          <div class="card-header">
+              <strong>Formulario de Registro</strong>
+          </div>
+          <div class="card-body card-block">
+              <form action="{% url 'global:crear_admin' %}" method="post" enctype="multipart/form-data" class="form-horizontal">
+                  <div class="row form-group">
+                      <div class="col col-md-3">{{ form.username.label }}</div>
+                      <div class="col-12 col-md-9">{{ form.username }}</div>
+                  </div>
+                  <div class="row form-group">
+                      <div class="col col-md-3">{{ form.first_name.label }}</div>
+                      <div class="col-12 col-md-9">{{ form.first_name }}</div>
+                  </div>
+                  <div class="row form-group">
+                      <div class="col col-md-3">{{ form.last_name.label }}</div>
+                      <div class="col-12 col-md-9">{{ form.last_name }}</div>
+                  </div>
+                  <div class="row form-group">
+                      <div class="col col-md-3">{{ form.email.label }}</div>
+                      <div class="col-12 col-md-9">{{ form.email }}</div>
+                  </div>
+                  <div class="row form-group">
+                      <div class="col col-md-3">{{ form.password.label }}</div>
+                      <div class="col-12 col-md-9">{{ form.password }}</div>
+                  </div>
+                  <div class="row form-group">
+                      <div class="col col-md-3">{{ form.pwd2.label }}</div>
+                      <div class="col-12 col-md-9">{{ form.pwd2 }}</div>
+                  </div>
+                  <div class="text-center">
+                      <button type="submit" class="btn btn-primary">Registrar</button>
+                      <a href="{% url 'global:listar_admin' %}" class="btn btn-danger">Cancelar</a>
+                  </div>
+              </form>
+          </div>
+      </div>
+  {% endif %}
+    {% if form.errors %} <!-- MML se imprimen los errores del formulario-->
+    {% for field in form %}
+        {% for error in field.errors %}
+            <div class="alert alert-danger">
+                <strong>{{ error|escape }}</strong>
+            </div>
+        {% endfor %}
+    {% endfor %}
+    {% for error in form.non_field_errors %}
+        <div class="alert alert-danger">
+            <strong>{{ error|escape }}</strong>
+        </div>
+    {% endfor %}
+    {% endif %}
+</form>
+
+{% endblock body %}

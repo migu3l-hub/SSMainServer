@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+	<title>bloque a un usuario</title>
+	<style>
+	body {
+	  background-color: #ff0000;
+	}
+
+	h1 {
+	  color: white;
+	  text-align: center;
+	}
+	h2 {
+	  color: white;
+	  text-align: center;
+	}
+
+	p {
+	  font-family: verdana;
+	  font-size: 20px;
+	}
+	</style>
+</head>
+<body>
+
+	<h1>Demasiados intentos, vuelve a intentar dentro de una hora.<h1>
+	<img src="{% static 'images/bloqueado.jpg' %}">
+	<h2>Sin embargo este incidente va ser reportado</h2>
+	
+</body>
+</html>

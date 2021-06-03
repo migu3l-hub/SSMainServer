@@ -1,0 +1,56 @@
+version: '3'
+services:
+  app:
+    env_file:
+      - app.env
+    image: djangored
+    networks:
+      - default
+    volumes:
+    - ./app/adminServer:/codigo
+    deploy:
+      mode: global
+
+  bd:
+    image: postgres:13.1
+    networks:
+      - default
+    env_file:
+      - bd.env
+    volumes:
+    - ./data_postgresql_appproy2020:/var/lib/postgresql/data
+    deploy:
+      replicas: 1
+
+
+  nginx:
+    image: nginx
+    ports:
+      - 8000:80 #se redirige al 80 de nginx
+    networks:
+      - traefik_public
+      - default
+    volumes:
+      - ./nginx/cnginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./app/adminServer/static:/static # se mapea a static del proyecto
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 50s
+        max_attempts: 10
+        window: 120s
+      mode: global
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=traefik_public"
+        - "traefik.http.routers.sec.rule=Host(djangored.net)"
+        - "traefik.http.services.nginx-service.loadbalancer.server.port=80"
+        - "traefik.http.services.nginx-service.loadbalancer.passhostheader=true"
+        - "traefik.http.routers.sec.entrypoints=web"
+
+
+networks:
+  traefik_public:
+    external: true
+

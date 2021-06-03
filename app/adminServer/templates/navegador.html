@@ -1,0 +1,12 @@
+﻿<nav class="container-fluid navbar-inverse navbar-fixed-top navbar-collapse">
+  <div class="navbar-header">
+    <a class="navbar-brand" href="{% url 'home' %}">Proyecto de Servicio Social</a>
+  </div>
+  <ul class="nav navbar-nav">
+    <li><a href="{% url 'global:login_global' %}">Gestionar usuarios</a></li>
+    <li><a href="{% url 'global:login_global' %}">Administrar servidores</a></li>
+  </ul>
+  <ul class="nav navbar-nav navbar-right">
+    <li><a href="{% url 'logout' %}"><span class="glyphicon glyphicon-log-in"></span> Cerrar Sesión</a></li>
+  </ul>
+</nav>
